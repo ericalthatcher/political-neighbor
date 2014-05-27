@@ -1,78 +1,31 @@
 /* global $ */
 'use strict';
 
-var p, 
-    t, 
-    frag, 
-    foo;
-// TODO: Make 1 call, not 5.  Iterate over array of element ids
-//  and url numbers.
-$.ajax({
-  url: 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/1/current.json?api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
-  type: 'GET',
-  dataType: 'json',
+var title_element,
+    title_render,
+    element_ids = ['ushd1', 'ushd2', 'ushd3', 'ushd4', 'ushd5'],
+    district_numbers = ['1', '2', '3', '4', '5'],
+    apiKey = 'api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
+    baseUrl = 'https://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/';
 
-  success: function (data) {
-    foo = data;
-    p = document.getElementById('sb');
-    t = document.createTextNode(foo.results[0].name + ' - District ' + foo.results[0].district );
-    p.appendChild(t);
+  for (var i = 0, total_districts = district_numbers.length; i < total_districts; i++) {
+      (function (i) {
+        var myUrl = baseUrl + district_numbers[i] + '/current.json?' + apiKey;
+
+        $.ajax({
+          url: myUrl,
+          dataType: 'json',
+
+          success: function (data) {
+            console.log('\nSUCCESS: ' + myUrl);
+            title_element = document.getElementById(element_ids[i]);        
+            title_render = document.createTextNode(data.results[0].name + ' - District ' + data.results[0].district );
+            title_element.appendChild(title_render);
+          },
+
+          error: function (data) {
+            console.log('\nFAIL: ' + myUrl);
+          }
+        })
+      })(i);
   }
-
-});
-
-$.ajax({
-  url: 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/2/current.json?api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
-  type: 'GET',
-  dataType: 'json',
-
-  success: function (data) {
-    foo = data;
-    p = document.getElementById('gw');
-    t = document.createTextNode(foo.results[0].name + ' - District ' + foo.results[0].district );
-    p.appendChild(t);
-  }
-
-});
-
-$.ajax({
-  url: 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/3/current.json?api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
-  type: 'GET',
-  dataType: 'json',
-
-  success: function (data) {
-    foo = data;
-    p = document.getElementById('eb');
-    t = document.createTextNode(foo.results[0].name + ' - District ' + foo.results[0].district );
-    p.appendChild(t);
-  }
-
-});
-
-$.ajax({
-  url: 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/4/current.json?api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
-  type: 'GET',
-  dataType: 'json',
-
-  success: function (data) {
-    foo = data;
-    p = document.getElementById('pd');
-    t = document.createTextNode(foo.results[0].name + ' - District ' + foo.results[0].district );
-    p.appendChild(t);
-  }
-
-});
-
-$.ajax({
-  url: 'http://api.nytimes.com/svc/politics/v3/us/legislative/congress/members/house/OR/5/current.json?api-key=6a4c73c2adc542140983b625c9dcf477:18:68003148',
-  type: 'GET',
-  dataType: 'json',
-
-  success: function (data) {
-    foo = data;
-    p = document.getElementById('ks');
-    t = document.createTextNode(foo.results[0].name + ' - District ' + foo.results[0].district );
-    p.appendChild(t);
-  }
-
-});
