@@ -5,4 +5,12 @@
 
 h3.a.big-title {
 	text-align: center;
-}
+},
+
+
+.column {
+	width: 620px;
+	margin: 10px;
+	float: #columnContainer { 
+	width: 0 auto;
+},
