@@ -11,30 +11,45 @@ var titleElement,
     memberIds = ['B001278&', 'W000791&', 'S001180&', 'D000191&', 'B000574&'],
     baseUrl = 'https://congress.api.sunlightfoundation.com/';
 
-  for (var i = 0, totalElements = elementIds.length; i < totalElements; i++) {
-      (function (i) {
-        var myUrl = baseUrl + chamberURL + apiKey;
-        $.ajax({
-          url: myUrl,
-          dataType: 'json',
+for (var i = 0, totalElements = elementIds.length; i < totalElements; i++) {
+    (function (i) {
+      var myUrl = baseUrl + chamberURL + apiKey;
+      $.ajax({
+        url: myUrl,
+        dataType: 'json',
 
-          success: function (data) {
-            console.log('\nSUCCESS: ' + myUrl);
-            titleElement = document.getElementById(elementIds[i]);        
-            titleRender = document.createTextNode(data.results[i].title + '. ' + 
-              data.results[i].first_name + ' ' + data.results[i].last_name + 
-              ' - District ' + data.results[i].district );
-            titleElement.appendChild(titleRender);
-          },
+        success: function (data) {
+          console.log('\nSUCCESS: ' + myUrl);
+          titleElement = document.getElementById(elementIds[i]);        
+          titleRender = document.createTextNode(data.results[i].title + '. ' + 
+            data.results[i].first_name + ' ' + data.results[i].last_name + 
+            ' - District ' + data.results[i].district );
+          titleElement.appendChild(titleRender);
+        },
 
-          error: function (data) {
-            console.log('\nFAIL: ' + myUrl);
-          }
-        })
-      })(i);
-  }
+        error: function (data) {
+          console.log('\nFAIL: ' + myUrl);
+        }
+      })
+    })(i);
+}
 
-  for (var i = 0, totalCommittees = memberIds.length; i < totalCommittees; i++) {
+$( document ).ready(function() {
+  
+//  Hides and Shows button on toggle
+  $('.js-toggle-hidden-facts').click(function () {
+      $(this).toggleClass('visible');
+      if ($(this).hasClass('visible')) {
+          $(this).text('Hide facts');
+      }
+      else {
+        $(this).text('Get facts');
+      }
+      $('.columnContainer').toggleClass('hide');
+  })
+});  
+
+for (var i = 0, totalCommittees = memberIds.length; i < totalCommittees; i++) {
       (function (i) {
         var myUrlTwo = baseUrl + committeeURL + memberIds[i] + apiKey;
         $.ajax({
