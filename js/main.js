@@ -1,6 +1,26 @@
 /* global $ */
 'use strict';
 
+//LB: apiURL works for chamber and committee callType,
+//  params allow the corrosponding data to be queried - need to further review params
+function apiURL (callType, params) {
+  var baseUrl = 'https://congress.api.sunlightfoundation.com/';
+  var apiKey = 'apikey=6e58b9075b9f4244aea471ee0e066e19';
+
+// TODO: do imputs for params on the UI
+// LB: what do chambers and committees need to build the right API call?
+  if (callType === ':chamber')
+    baseUrl += 'legislators?chamber=' + params.chamber + '&state=' + params.state;
+  else if (callType === ':committees')
+    baseUrl += 'committees?member_ids=' + params.id;
+  else
+    console.error('ERROR: Bad API URL!');
+  
+  return baseUrl + apiKey;
+}
+
+
+
 var titleElement,
     titleRender,
     myUrl,
@@ -9,26 +29,9 @@ var titleElement,
     committeeCall,
     elementIds = ['ushd1', 'ushd2', 'ushd3', 'ushd4', 'ushd5'],
     elementFacts = ['ushdF1', 'ushdF2', 'ushdF3', 'ushdF4', 'ushdF5'],
-    apiKey = 'apikey=6e58b9075b9f4244aea471ee0e066e19',
-    chamberURL = 'legislators?chamber=house&state=OR&',
-    committeeURL = 'committees?member_ids=',
     memberIds = ['B001278&', 'W000791&', 'S001180&', 'D000191&', 'B000574&'],
-    baseUrl = 'https://congress.api.sunlightfoundation.com/';
 
-// single responsibility function
-
-// iteration of elements
-
-var elem_iterate = function () {
-  for (var i = 0, totalElements = elementIds.length; i < totalElements; i++){
-  }
-  console.log(i);
-}
-
-
-
-
- {
+for (var i = 0, totalElements = elementIds.length; i < totalElements; i++) {
     (function (i) {
       myUrl = baseUrl + chamberURL + apiKey;
       nameCall = $.ajax({
@@ -48,8 +51,7 @@ var elem_iterate = function () {
               console.log('\nFAIL: ' + myUrl);
             }
           })
-    });
-    // (i);
+    })(i);
 }
 $.noConflict();
 jQuery(document).ready(function($) {
@@ -65,30 +67,25 @@ jQuery(document).ready(function($) {
       }
       $('.columnContainer').toggleClass('hide');
   })
-
-  //not iterating over each memberID
-  for (var i = 0, totalCommittees = memberIds.length; i < totalCommittees; i++) {
-        (function (i) {
-          myUrlTwo = baseUrl + committeeURL + memberIds[i] + apiKey;
-          committeeCall = $.ajax({
-                              url: myUrlTwo,
-                              dataType: 'json',
-
-                              success: function (data) {
-                                $(function() {
-                                    console.log('\nSUCCESS: ' + myUrlTwo);
-                                    titleElement = $('#' + elementFacts[i]);        
-                                    // need to iterate through memberIds so each member has their own committees
-                                    //  right now they only have one Ids committees
-                                    titleElement.append('Committees: ' + '\n' + data.results[i].name);
-                                  })
-                                },
-                              error: function (data) {
-                                console.log('\nFAIL: ' + myUrlTwo);
-                              }
-                            })
-        })(i);
-  }
-    // console.log(memberIds);
-
 });  
+
+for (var i = 0, totalCommittees = memberIds.length; i < totalCommittees; i++) {
+      (function (i) {
+        myUrlTwo = baseUrl + committeeURL + memberIds[i] + apiKey;
+        committeeCall = $.ajax({
+                            url: myUrlTwo,
+                            dataType: 'json',
+
+                            success: function (data) {
+                              console.log('\nSUCCESS: ' + myUrlTwo);
+                              titleElement = document.getElementById(elementFacts[i]);        
+                              titleRender = document.createTextNode('Committees: ' + '\n' + data.results[i].name);
+                              titleElement.appendChild(titleRender);
+                            },
+
+                            error: function (data) {
+                              console.log('\nFAIL: ' + myUrlTwo);
+                            }
+                          })
+      })(i);
+}
