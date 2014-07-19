@@ -1,91 +1,108 @@
 /* global $ */
 'use strict';
 
-//LB: apiURL works for chamber and committee callType,
-//  params allow the corrosponding data to be queried - need to further review params
+/**
+* TODO: review params
+* apiURL works for chamber and committee callType,
+*/
+
 function apiURL (callType, params) {
   var baseUrl = 'https://congress.api.sunlightfoundation.com/';
-  var apiKey = 'apikey=6e58b9075b9f4244aea471ee0e066e19';
+  var apiKey  = '&apikey=6e58b9075b9f4244aea471ee0e066e19';
 
-// TODO: do imputs for params on the UI
-// LB: what do chambers and committees need to build the right API call?
+/**
+* TODO: do imputs for params on the UI to scale beyond Oregon
+* what chambers and committees need to build the right API call
+*/  
   if (callType === ':chamber')
-    baseUrl += 'legislators?chamber=' + params.chamber + '&state=' + params.state;
+    baseUrl += 'legislators?chamber='+ params.chamber +'&state=' + params.state;
   else if (callType === ':committees')
     baseUrl += 'committees?member_ids=' + params.id;
   else
-    console.error('ERROR: Bad API URL!');
-  
+    console.error('ERROR: Bad API URL');
+
   return baseUrl + apiKey;
 }
 
+/**
+* Sets up member function that holds name, id, and committee
+* information.  
+*/
+var Member = function (first, last, id) {
+  this.first      = first;
+  this.last       = last;
+  this.id         = id;
+  this.name       = this.first + ' ' + this.last;
+  this.shortname  = (this.last + this.first[0]).toLowerCase();
+  this.committees = [];
+};
 
+Member.prototype.setCommittees = function(committees) {
+  this.committees = committees;
+};
 
-var titleElement,
-    titleRender,
-    myUrl,
-    myUrlTwo,
-    nameCall,
-    committeeCall,
-    elementIds = ['ushd1', 'ushd2', 'ushd3', 'ushd4', 'ushd5'],
-    elementFacts = ['ushdF1', 'ushdF2', 'ushdF3', 'ushdF4', 'ushdF5'],
-    memberIds = ['B001278&', 'W000791&', 'S001180&', 'D000191&', 'B000574&'],
+/**
+* placeOnPage - inserts html structure onto page.  
+*/
+Member.prototype.placeOnPage = function() {
+  var template = '<div class="columnContainer hide"> <div class="column"> <h3 class="title" id="'+ this.shortname +'">'+ this.name +'</h3> <div class="row"> <div class="large-6 columns"><img id="politican" src="img/'+ this.shortname +'.jpg" data-name="'+ this.name +'"></div><p class="facts" id="'+ this.shortname +'"> '+ this.committees +' </p></div><hr /></div> </div>';
 
-for (var i = 0, totalElements = elementIds.length; i < totalElements; i++) {
-    (function (i) {
-      myUrl = baseUrl + chamberURL + apiKey;
-      nameCall = $.ajax({
-            url: myUrl,
-            dataType: 'json',
+  $(function(){
+    $('#member-list').append(template);
+  });
+};
 
-            success: function (data) {
-              console.log('\nSUCCESS: ' + myUrl);
-              titleElement = document.getElementById(elementIds[i]);        
-              titleRender = document.createTextNode(data.results[i].title + '. ' + 
-                data.results[i].first_name + ' ' + data.results[i].last_name + 
-                ' - District ' + data.results[i].district );
-              titleElement.appendChild(titleRender);
-            },
+/**
+* toggleGetFactsButton - shows facts!
+*/
 
-            error: function (data) {
-              console.log('\nFAIL: ' + myUrl);
-            }
-          })
-    })(i);
-}
-$.noConflict();
-jQuery(document).ready(function($) {
-  
-  //  Hides and Shows button on toggle
+var toggleGetFactsButton = function(){
   $('.js-toggle-hidden-facts').click(function () {
-      $(this).toggleClass('visible');
-      if ($(this).hasClass('visible')) {
-          $(this).text('Hide facts');
-      }
-      else {
-        $(this).text('Get facts');
-      }
-      $('.columnContainer').toggleClass('hide');
-  })
-});  
+    var $btn = $(this);
+    $btn.toggleClass('visible');
 
-for (var i = 0, totalCommittees = memberIds.length; i < totalCommittees; i++) {
-      (function (i) {
-        myUrlTwo = baseUrl + committeeURL + memberIds[i] + apiKey;
-        committeeCall = $.ajax({
-                            url: myUrlTwo,
-                            dataType: 'json',
+    if ($btn.hasClass('visible'))
+      $btn.text('Hide facts');
+    else
+      $btn.text('Get facts');
 
-                            success: function (data) {
-                              console.log('\nSUCCESS: ' + myUrlTwo);
-                              titleElement = document.getElementById(elementFacts[i]);        
-                              titleRender = document.createTextNode('Committees: ' + '\n' + data.results[i].name);
-                              titleElement.appendChild(titleRender);
-                            },
+    $('.columnContainer').toggleClass('hide');
+  });
+};
 
-                            error: function (data) {
-                              console.log('\nFAIL: ' + myUrlTwo);
-                            }
-                          })
-      })(i);
+/**
+* getMembers - sets up ajax call with custom chamber and state
+*/
+function getMembers (chamber, state) {
+  $.ajax({url: apiURL(':chamber', {chamber: chamber, state: state}), dataType: 'json'})
+   .error(function(data){ console.error('ERROR in getMembers'); })
+   .success(function (data) {
+      var members = $.map(data.results, function(e, i){
+        return new Member(e.first_name, e.last_name, e.bioguide_id);
+      });
+      getCommitteesFor(members);
+  });
 }
+
+function getCommitteesFor (members) {
+  for (var i in members)
+    getCommittees(members[i]);
+}
+
+/**
+* getCommittees - gets committee data for given member
+*/
+function getCommittees (member) {
+  $.ajax({url: apiURL(':committees', {id: member.id}), dataType: 'json'})
+   .error(function(data){ console.error('ERROR in getCommittees'); })
+   .success(function (data) {
+      var coms = $.map(data.results, function(e, i){ return e.name; });
+      member.setCommittees(coms);
+      member.placeOnPage();
+  });
+}
+
+$(document).ready(function() {
+  toggleGetFactsButton();
+  getMembers('house', 'OR');
+});
