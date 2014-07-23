@@ -16,4 +16,8 @@ h3.a.big-title {
 
 .hide {
 	display: none;
-}
+},
+
+h4.list-header {
+    background-color: #c60f13;
+},	

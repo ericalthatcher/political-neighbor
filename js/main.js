@@ -45,7 +45,7 @@ Member.prototype.setCommittees = function(committees) {
 * placeOnPage - inserts html structure onto page.  
 */
 Member.prototype.placeOnPage = function() {
-  var template = '<div class="columnContainer hide"> <div class="column"> <h3 class="title" id="'+ this.shortname +'">'+ this.name +'</h3> <div class="row"> <div class="large-6 columns"><img id="politican" src="img/'+ this.shortname +'.jpg" data-name="'+ this.name +'"></div><p class="facts" id="'+ this.shortname +'"> '+ this.committees +' </p></div><hr /></div> </div>';
+  var template = '<div class="columnContainer hide"> <div class="column"> <h3 class="title" id="'+ this.shortname +'">'+ this.name +'</h3> <div class="row"> <div class="large-6 columns"><img id="politican" src="img/'+ this.shortname +'.jpg" data-name="'+ this.name +'"><h5 class="list-header"><u>Committees</u></h5><p class="facts" id="'+ this.shortname +'"> '+ this.committees.join(" <br> ") +' </p></div></div><hr /></div> </div>';
 
   $(function(){
     $('#member-list').append(template);

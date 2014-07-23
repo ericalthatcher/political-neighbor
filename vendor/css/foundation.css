@@ -1247,6 +1247,9 @@ meta.foundation-mq-topbar {
       z-index: 98;
       margin-top: 45px; }
 
+h5.list-header {
+  color: #c60f13; },
+
 .top-bar {
   overflow: hidden;
   height: 45px;
