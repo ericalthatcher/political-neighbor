@@ -38,8 +38,14 @@ var Member = function (first, last, id) {
 };
 
 Member.prototype.setCommittees = function(committees) {
-  this.committees = committees;
+  this.committees = committees.sort(sortAlpha);
+  
+  function sortAlpha(a,b){
+    return a.toLowerCase() > b.toLowerCase() ? 1 : -1;
+  };
+
 };
+
 
 /**
 * placeOnPage - inserts html structure onto page.  
