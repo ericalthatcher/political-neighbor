@@ -1,23 +1,26 @@
-
 .S1, .S2, .S3 {
   margin: 10px 0;
-},
+}
 
 h3.a.big-title {
 	text-align: center;
-},
+}
 
 .column {
 	width: 620px;
 	margin: 10px;
-	float: #columnContainer { 
+	float: left;
 	width: 0 auto;
-},
+}
 
 .hide {
 	display: none;
-},
+}
 
 h4.list-header {
-    background-color: #c60f13;
-},	
+  background-color: #c60f13;
+}
+
+[class*="column"]+[class*="column"]:last-child {
+  float: left;
+}
